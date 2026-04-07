@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mo Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: #2a2a35;
+    --accent: #7c6af7;
+    --accent2: #b49cf8;
+    --text: #e8e8f0;
+    --text2: #8888aa;
+    --text3: #555570;
+    --success: #4eca8b;
+    --font-size: 14px;
+    --radius: 12px;
+    --sidebar: 220px;
+  }
+
+  /* THEMES */
+  [data-theme="dark"] { --bg:#080808;--surface:#111;--surface2:#1a1a1a;--border:#222;--accent:#e0e0e0;--accent2:#aaa;--text:#f0f0f0;--text2:#777;--text3:#444; }
+  [data-theme="ocean"] { --bg:#020d1a;--surface:#061525;--surface2:#0a2035;--border:#0d3050;--accent:#00b4d8;--accent2:#48cae4;--text:#caf0f8;--text2:#5599bb;--text3:#224466; }
+  [data-theme="forest"] { --bg:#060f08;--surface:#0d1a0f;--surface2:#122015;--border:#1a3020;--accent:#4caf73;--accent2:#80c99a;--text:#c8ecd2;--text2:#5a9970;--text3:#2a4a35; }
+  [data-theme="sunset"] { --bg:#120807;--surface:#1e100d;--surface2:#2a1510;--border:#3d1f18;--accent:#ff6b35;--accent2:#ff9a6c;--text:#fde8e0;--text2:#99554a;--text3:#552a22; }
+  [data-theme="rose"] { --bg:#120a0f;--surface:#1e1018;--surface2:#2a1522;--border:#3d1f33;--accent:#e879a0;--accent2:#f4a6c1;--text:#fde0ec;--text2:#995577;--text3:#552244; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Mono', monospace;
+    font-size: var(--font-size);
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .app {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .logo span {
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 0.82rem;
+    letter-spacing: 0.3px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--surface2); }
+
+  .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 0.82rem;
+    transition: color 0.15s;
+  }
+
+  .settings-btn:hover { color: var(--text); }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .tab-panel { display: none; flex-direction: column; height: 100%; }
+  .tab-panel.active { display: flex; }
+
+  /* CHAT TAB */
+  .chat-header {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg { display: flex; gap: 12px; animation: fadeUp 0.25s ease; }
+  .msg.user { flex-direction: row-reverse; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  .msg.assistant .msg-avatar { background: var(--accent); color: #fff; }
+  .msg.user .msg-avatar { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+
+  .msg-bubble {
+    max-width: 72%;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 0.87rem;
+    line-height: 1.65;
+  }
+
+  .msg.assistant .msg-bubble { background: var(--surface2); border: 1px solid var(--border); }
+  .msg.user .msg-bubble { background: var(--accent); color: #fff; }
+
+  .msg-bubble p { margin-bottom: 8px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-bubble code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; }
+  .msg-bubble pre { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; overflow-x:auto; margin:6px 0; }
+
+  .typing-indicator { display: flex; gap: 5px; padding: 4px 0; }
+  .typing-dot { width:7px;height:7px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite; }
+  .typing-dot:nth-child(2){animation-delay:.2s}
+  .typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+  .chat-input-area {
+    padding: 16px 28px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.87rem;
+    resize: none;
+    outline: none;
+    max-height: 140px;
+    min-height: 44px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text3); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    width: 44px; height: 44px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ESSAY TAB */
+  .essay-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .essay-controls {
+    width: 340px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 22px 22px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .essay-controls::-webkit-scrollbar { width: 3px; }
+  .essay-controls::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .essay-output {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .essay-output-header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .essay-output-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .copy-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  .essay-text-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px;
+  }
+
+  .essay-text-area::-webkit-scrollbar { width: 4px; }
+  .essay-text-area::-webkit-scrollbar-thumb { background: var(--border); }
+
+  #essay-output-text {
+    font-size: 0.92rem;
+    line-height: 1.85;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 100%;
+  }
+
+  .essay-placeholder {
+    color: var(--text3);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 80px;
+    line-height: 2;
+  }
+
+  /* FORM CONTROLS */
+  .ctrl-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ctrl-label {
+    font-size: 0.7rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 2px;
+  }
+
+  .ctrl-input, .ctrl-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.84rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+
+  .ctrl-input:focus, .ctrl-select:focus { border-color: var(--accent); }
+  .ctrl-select option { background: var(--surface); }
+
+  .ctrl-range { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+  .range-labels { display: flex; justify-content: space-between; color: var(--text3); font-size: 0.7rem; margin-top: 3px; }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    gap: 6px;
+  }
+
+  .toggle-item:hover { border-color: var(--text3); }
+  .toggle-item.on { border-color: var(--accent); }
+
+  .toggle-label { font-size: 0.73rem; color: var(--text2); line-height: 1.3; }
+
+  .toggle-switch {
+    width: 28px; height: 16px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 11px; height: 11px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2.5px; left: 2.5px;
+    transition: transform 0.2s;
+  }
+
+  .toggle-item.on .toggle-switch { background: var(--accent); }
+  .toggle-item.on .toggle-switch::after { transform: translateX(12px); }
+
+  .generate-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.5px;
+    transition: opacity 0.15s;
+  }
+
+  .generate-btn:hover { opacity: 0.88; }
+  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .section-divider {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* SETTINGS PANEL */
+  .settings-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .settings-overlay.open { display: flex; }
+
+  .settings-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    width: 400px;
+    max-width: 90vw;
+    animation: slideUp 0.2s ease;
+  }
+
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .settings-panel h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .settings-section { margin-bottom: 24px; }
+  .settings-section-label {
+    font-size: 0.7rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .theme-btn {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background: var(--surface2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s;
+  }
+
+  .theme-btn:hover { border-color: var(--text3); }
+  .theme-btn.active { border-color: var(--accent); }
+
+  .theme-preview {
+    width: 44px; height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .theme-preview-half { flex: 1; }
+
+  .theme-name {
+    font-size: 0.68rem;
+    color: var(--text2);
+    text-align: center;
+  }
+
+  .font-size-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .font-size-control input { flex: 1; accent-color: var(--accent); }
+  .font-size-val {
+    font-size: 0.8rem;
+    color: var(--text2);
+    width: 36px;
+    text-align: right;
+  }
+
+  .close-settings {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 20px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+    transition: all 0.15s;
+  }
+
+  .close-settings:hover { color: var(--text); border-color: var(--accent); }
+
+  /* STREAMING */
+  .stream-cursor {
+    display: inline-block;
+    width: 2px; height: 14px;
+    background: var(--accent);
+    margin-left: 2px;
+    animation: blink 0.7s infinite;
+    vertical-align: middle;
+  }
+  @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+
+  .word-count-display {
+    font-size: 0.72rem;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <h1>Mo Features</h1>
+      <span>AI Workspace</span>
+    </div>
+    <div class="nav-item active" onclick="switchTab('chat')">
+      <span class="nav-icon">💬</span> Chat
+    </div>
+    <div class="nav-item" onclick="switchTab('essay')">
+      <span class="nav-icon">✍️</span> Essay Writer
+    </div>
+    <div class="sidebar-footer">
+      <div class="settings-btn" onclick="openSettings()">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- CHAT TAB -->
+    <div class="tab-panel active" id="tab-chat">
+      <div class="chat-header">
+        <div class="status-dot"></div>
+        <h2>Chat with Claude</h2>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg assistant">
+          <div class="msg-avatar">M</div>
+          <div class="msg-bubble">Hey! I'm Claude, powered by Mo Features. Ask me anything — I'm here to help.</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+
+    <!-- ESSAY TAB -->
+    <div class="tab-panel" id="tab-essay">
+      <div class="essay-layout">
+        <div class="essay-controls">
+
+          <div class="section-divider">Content</div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Topic / Prompt</div>
+            <input class="ctrl-input" id="essay-topic" placeholder="e.g. The impact of AI on society" />
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Essay Type</div>
+            <select class="ctrl-select" id="essay-type">
+              <option>Argumentative</option>
+              <option>Expository</option>
+              <option>Descriptive</option>
+              <option>Narrative</option>
+              <option>Compare & Contrast</option>
+              <option>Persuasive</option>
+              <option>Analytical</option>
+              <option>Research</option>
+              <option>Reflective</option>
+              <option>Critical Review</option>
+            </select>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Tone</div>
+            <select class="ctrl-select" id="essay-tone">
+              <option>Formal</option>
+              <option>Semi-formal</option>
+              <option>Casual</option>
+              <option>Academic</option>
+              <option>Persuasive</option>
+              <option>Neutral</option>
+              <option>Conversational</option>
+            </select>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Word Count — <span id="wc-label">500</span> words</div>
+            <input type="range" class="ctrl-range" id="essay-wc" min="100" max="3000" step="50" value="500"
+              oninput="document.getElementById('wc-label').textContent=this.value" />
+            <div class="range-labels"><span>100</span><span>3000</span></div>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Reading Level</div>
+            <select class="ctrl-select" id="essay-level">
+              <option>Elementary</option>
+              <option>Middle School</option>
+              <option selected>High School</option>
+              <option>Undergraduate</option>
+              <option>Graduate / Expert</option>
+            </select>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Citation Style</div>
+            <select class="ctrl-select" id="essay-citation">
+              <option>None</option>
+              <option>APA</option>
+              <option>MLA</option>
+              <option>Chicago</option>
+              <option>Harvard</option>
+              <option>Vancouver</option>
+            </select>
+          </div>
+
+          <div class="section-divider">Humanization</div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Typing Duration — <span id="td-label">Fast</span></div>
+            <input type="range" class="ctrl-range" id="essay-typing" min="1" max="5" step="1" value="2"
+              oninput="updateTypingLabel(this.value)" />
+            <div class="range-labels"><span>Instant</span><span>Very Slow</span></div>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-label">Mistake Frequency</div>
+            <select class="ctrl-select" id="essay-mistakes">
+              <option value="0">None — Perfect</option>
+              <option value="1">Rare — 1 per paragraph</option>
+              <option value="2">Light — 2-3 per paragraph</option>
+              <option value="3">Moderate — noticeable</option>
+              <option value="4">Heavy — clearly human</option>
+            </select>
+          </div>
+
+          <div class="section-divider">Behaviour Toggles</div>
+
+          <div class="toggle-grid">
+            <div class="toggle-item" id="tog-thesis" onclick="toggleItem(this)">
+              <span class="toggle-label">Strong Thesis</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item on" id="tog-hooks" onclick="toggleItem(this)">
+              <span class="toggle-label">Hook Intro</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item on" id="tog-counter" onclick="toggleItem(this)">
+              <span class="toggle-label">Counterarguments</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item" id="tog-quotes" onclick="toggleItem(this)">
+              <span class="toggle-label">Include Quotes</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item on" id="tog-conclusion" onclick="toggleItem(this)">
+              <span class="toggle-label">Strong Conclusion</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item" id="tog-transitions" onclick="toggleItem(this)">
+              <span class="toggle-label">Transition Phrases</span>
+              <div class="toggle-switch"></div>
+            </div>
+            <div class="toggle-item" id="tog-firstperson" onclick="toggleItem(this)">
+              <span class="toggle-label">First-Person Voice</span>
+              <div class="toggle-switch"></div>
+            </div>
+          </div>
+
+          <button class="generate-btn" id="gen-btn" onclick="generateEssay()">✦ Generate Essay</button>
+
+        </div>
+
+        <div class="essay-output">
+          <div class="essay-output-header">
+            <h3>Output</h3>
+            <button class="copy-btn" onclick="copyEssay()">Copy</button>
+          </div>
+          <div class="essay-text-area">
+            <div id="essay-output-text">
+              <div class="essay-placeholder">
+                ← Configure your essay options<br>and hit Generate
+              </div>
+            </div>
+            <div class="word-count-display" id="essay-wc-display"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
+  <div class="settings-panel">
+    <h2>⚙️ Settings</h2>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Theme</div>
+      <div class="theme-grid">
+        <button class="theme-btn active" onclick="setTheme('default', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#0d0d0f"></div>
+            <div class="theme-preview-half" style="background:#7c6af7"></div>
+          </div>
+          <span class="theme-name">Default</span>
+        </button>
+        <button class="theme-btn" onclick="setTheme('dark', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#080808"></div>
+            <div class="theme-preview-half" style="background:#e0e0e0"></div>
+          </div>
+          <span class="theme-name">Dark</span>
+        </button>
+        <button class="theme-btn" onclick="setTheme('ocean', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#020d1a"></div>
+            <div class="theme-preview-half" style="background:#00b4d8"></div>
+          </div>
+          <span class="theme-name">Ocean</span>
+        </button>
+        <button class="theme-btn" onclick="setTheme('forest', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#060f08"></div>
+            <div class="theme-preview-half" style="background:#4caf73"></div>
+          </div>
+          <span class="theme-name">Forest</span>
+        </button>
+        <button class="theme-btn" onclick="setTheme('sunset', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#120807"></div>
+            <div class="theme-preview-half" style="background:#ff6b35"></div>
+          </div>
+          <span class="theme-name">Sunset</span>
+        </button>
+        <button class="theme-btn" onclick="setTheme('rose', this)">
+          <div class="theme-preview">
+            <div class="theme-preview-half" style="background:#120a0f"></div>
+            <div class="theme-preview-half" style="background:#e879a0"></div>
+          </div>
+          <span class="theme-name">Rose</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Font Size</div>
+      <div class="font-size-control">
+        <input type="range" min="11" max="20" step="1" value="14" id="font-slider"
+          oninput="setFontSize(this.value)" />
+        <span class="font-size-val" id="font-size-val">14px</span>
+      </div>
+    </div>
+
+    <button class="close-settings" onclick="closeSettings()">Close</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = "claude-sonnet-4-20250514";
+let chatHistory = [];
+let isChatBusy = false;
+let currentTheme = 'default';
+
+/* TAB SWITCHING */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* CHAT */
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChat();
+  }
+}
+
+function appendMsg(role, content, typing=false) {
+  const box = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="msg-avatar">${role === 'assistant' ? 'M' : 'Y'}</div>
+    <div class="msg-bubble">${typing ? '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>' : ''}<span class="msg-text">${content}</span></div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function formatMarkdown(text) {
+  return text
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^/, '<p>').replace(/$/, '</p>');
+}
+
+async function sendChat() {
+  if (isChatBusy) return;
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  isChatBusy = true;
+  document.getElementById('send-btn').disabled = true;
+
+  appendMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  const typingDiv = appendMsg('assistant', '', true);
+  const bubble = typingDiv.querySelector('.msg-bubble');
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1000,
+        system: "You are a helpful, friendly assistant inside Mo Features — a personal AI workspace. Be concise but thorough.",
+        messages: chatHistory
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, no response.';
+
+    bubble.innerHTML = formatMarkdown(reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    const box = document.getElementById('chat-messages');
+    box.scrollTop = box.scrollHeight;
+  } catch(e) {
+    bubble.innerHTML = '<span style="color:#ff6b6b">Error connecting to Claude. Check your network.</span>';
+  }
+
+  isChatBusy = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+/* ESSAY */
+function toggleItem(el) {
+  el.classList.toggle('on');
+}
+
+function updateTypingLabel(val) {
+  const labels = ['', 'Fast', 'Medium', 'Slow', 'Very Slow', 'Glacial'];
+  document.getElementById('td-label').textContent = labels[val] || val;
+}
+
+function getToggles() {
+  const map = {
+    'tog-thesis': 'Include a strong, clear thesis statement',
+    'tog-hooks': 'Start with an engaging hook introduction',
+    'tog-counter': 'Address counterarguments',
+    'tog-quotes': 'Include relevant quotes or examples',
+    'tog-conclusion': 'End with a strong, memorable conclusion',
+    'tog-transitions': 'Use smooth transition phrases between paragraphs',
+    'tog-firstperson': 'Write in first-person voice'
+  };
+  return Object.entries(map)
+    .filter(([id]) => document.getElementById(id)?.classList.contains('on'))
+    .map(([, label]) => label);
+}
+
+async function generateEssay() {
+  const topic = document.getElementById('essay-topic').value.trim();
+  if (!topic) { alert('Please enter a topic.'); return; }
+
+  const type = document.getElementById('essay-type').value;
+  const tone = document.getElementById('essay-tone').value;
+  const wc = document.getElementById('essay-wc').value;
+  const level = document.getElementById('essay-level').value;
+  const citation = document.getElementById('essay-citation').value;
+  const mistakes = document.getElementById('essay-mistakes').value;
+  const toggles = getToggles();
+
+  const mistakeInstructions = [
+    '',
+    'Occasionally include 1 very subtle typo or grammatical slip per paragraph (then leave it — do not correct).',
+    'Include 2-3 minor typos or awkward phrasings per paragraph to feel naturally human-written.',
+    'Include noticeable mistakes throughout — wrong word choices, occasional comma splices, typos — like a real student.',
+    'Write with heavy humanization: frequent typos, run-on sentences, colloquialisms, and imperfect grammar throughout.'
+  ][parseInt(mistakes)];
+
+  const prompt = `Write a ${type} essay on the topic: "${topic}".
+
+Requirements:
+- Tone: ${tone}
+- Word count: approximately ${wc} words
+- Reading level: ${level}
+- Citation style: ${citation === 'None' ? 'No citations needed' : citation + ' style citations where appropriate'}
+${toggles.length ? '- Behaviour:\n' + toggles.map(t => '  • ' + t).join('\n') : ''}
+${mistakeInstructions ? '- Humanization: ' + mistakeInstructions : ''}
+
+Write the full essay only. No preamble, no meta-commentary.`;
+
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('gen-btn').textContent = '⏳ Generating...';
+
+  const outputEl = document.getElementById('essay-output-text');
+  const wcDisplay = document.getElementById('essay-wc-display');
+  outputEl.textContent = '';
+  wcDisplay.textContent = '';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Error generating essay.';
+
+    // Simulate typing based on duration setting
+    const typingSpeed = parseInt(document.getElementById('essay-typing').value);
+    const delays = [0, 2, 8, 20, 45, 90]; // ms per char
+    const delay = delays[typingSpeed] || 0;
+
+    outputEl.innerHTML = '';
+
+    if (delay === 0) {
+      outputEl.textContent = text;
+    } else {
+      const cursor = document.createElement('span');
+      cursor.className = 'stream-cursor';
+      outputEl.appendChild(cursor);
+
+      for (let i = 0; i < text.length; i++) {
+        outputEl.insertBefore(document.createTextNode(text[i]), cursor);
+        await new Promise(r => setTimeout(r, delay + Math.random() * delay * 0.5));
+        document.getElementById('essay-text-area') && (document.querySelector('.essay-text-area').scrollTop = 99999);
+      }
+      cursor.remove();
+    }
+
+    const wordCount = text.trim().split(/\s+/).length;
+    wcDisplay.textContent = `~${wordCount} words`;
+
+  } catch(e) {
+    outputEl.textContent = 'Error generating essay. Please try again.';
+  }
+
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('gen-btn').textContent = '✦ Generate Essay';
+}
+
+function copyEssay() {
+  const text = document.getElementById('essay-output-text').textContent;
+  if (!text || text.includes('Configure your essay')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+/* SETTINGS */
+function openSettings() { document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+function closeSettingsOutside(e) { if (e.target === document.getElementById('settings-overlay')) closeSettings(); }
+
+function setTheme(theme, btn) {
+  document.documentElement.setAttribute('data-theme', theme === 'default' ? '' : theme);
+  currentTheme = theme;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setFontSize(val) {
+  document.documentElement.style.setProperty('--font-size', val + 'px');
+  document.getElementById('font-size-val').textContent = val + 'px';
+}
+</script>
+
+</body>
+</html>
